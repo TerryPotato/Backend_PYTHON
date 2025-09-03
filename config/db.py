@@ -18,11 +18,12 @@ def init_db(app):
     app.config['MYSQL_PORT'] = int(os.getenv("DB_PORT"))
     mysql.init_app(app)
 
-# Funcion para obtener el cursos a la base de datos
+# Funcion para obtener el cursor a la base de datos
+#el cursos recorre la base de datos
 def get_db_connection():
-    """Devuelve un cursor para interacruar con la base de datos""" 
+    '''Devuelve un cursor para interacruar con la base de datos'''
     try:
         connection = mysql.connection
         return connection.cursor()
-    except Exception as e:
-        raise RuntimeError(f"Error al conectar a la base de datos: {e}")
+    except Exception as error:
+        raise RuntimeError(f"Error al conectar a la base de datos: {error}")
