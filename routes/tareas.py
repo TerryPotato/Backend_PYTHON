@@ -30,20 +30,10 @@ def crear():
     try:
         cursor.execute(
             'INSERT INTO tareas (descripcion, id_usuario) VALUES (%s, %s)',
-            (descripcion, id_usuario)
-        )
+            (descripcion, id_usuario))
+        cursor.connection.commit()
         return jsonify({"mensaje" : f"ʕ•́ᴥ•̀ʔっ Tu tarea: {descripcion}, ha sido creada"}), 200
     except Exception as error:
         return jsonify({"error" : f"No se pudo crear la tarea: {str(error)}"})
     finally:
         cursor.close()
-#
-#Crear un endpoint usando el PUT y pasando datos por el body y el URL
-@tareas_bp.route('/editar/<int:user_id>', methods = ['PUT'])
-def editar(user_id):
-    #obtenemos los datos de body
-    data = request.get_json()
-    nombre = data.get('nombre')
-    apellido = data.get('apellido')
-    mensaje = f" ʕ•́ᴥ•̀ʔっ El usuario {nombre} {apellido} con ID: {user_id} ha sido modificado correctamente."
-    return  jsonify({"mensaje": mensaje})

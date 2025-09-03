@@ -59,10 +59,13 @@ def registrar():
         cursor.close()
         
 
-
-
-
-# Obtener datos
-@users_bp.route('/datos', methods = ['GET']) #<- obtener lo datos
-def obtener_datos():
-    return jsonify({"mensaje" : "Hola mundo!"})
+# No hace nada aun:
+#Crear un endpoint usando el PUT y pasando datos por el body y el URL
+@users_bp.route('/editar/<int:user_id>', methods = ['PUT'])
+def editar(user_id):
+    #obtenemos los datos de body
+    data = request.get_json()
+    nombre = data.get('nombre')
+    apellido = data.get('apellido')
+    mensaje = f" ʕ•́ᴥ•̀ʔっ El usuario {nombre} {apellido} con ID: {user_id} ha sido modificado correctamente."
+    return  jsonify({"mensaje": mensaje})
