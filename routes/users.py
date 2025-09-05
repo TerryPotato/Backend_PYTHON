@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 # Cargar las variables de entorno
 load_dotenv()
 
-# Creamos el blueprint
+# Creamos el blueprint (la ruta)
 users_bp = Blueprint('users', __name__)
 
 # inicializar Bcrypt
@@ -21,16 +21,24 @@ users_bp = Blueprint('users', __name__)
 
 # -------- END POINTS -------------
 
+def validar_campos_requeridos(data, campos):
+    faltantes = [campo for campo in campos if not data.get(campo)]
+    if faltantes:
+        return False, f"ʕ•́ᴥ•̀ʔっ Faltan los siguientes campos: {', '.join(faltantes)}"
+    return True, None
+
 @users_bp.route('/register', methods = ["POST"]) #<- Registrar un usuario
 def registrar():
-    # Obtengo del JSON los datos enviados por el metodo POST
+    # Obtengo del JSON los datos enviados por el metodo POST por medio del body
     data = request.get_json()
+    campos_requeridos = ["nombre", "email", "password"]
+    valido, mensaje = validar_campos_requeridos(data, campos_requeridos)
+    if not valido:
+        return jsonify({"error": mensaje}), 400
+
     nombre = data.get("nombre")
     email = data.get("email")
     password = data.get("password")
-
-    if not nombre or not  email or not password:
-        return jsonify({"error" : "Porfavor llena todos los campos"}), 400
 
     #obtenemos la conexion a la base de datos
     cursor = get_db_connection()
@@ -41,18 +49,18 @@ def registrar():
         existing_user = cursor.fetchone()
 
         if existing_user:
-            return jsonify({"error" : "Este usuario ya existe"}), 400
+            return jsonify({"error" : "ʕ•́ᴥ•̀ʔっ Este usuario ya existe"}), 400
         # Hash a la contraseña con Flask-Bcrypt
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         #insertar el nuevo usuario
-        cursor.execute('''INSERT INTO users (nombre,  email, password)
+        cursor.execute('''INSERT INTO users (nombre, email, password)
                        VALUES (%s, %s, %s)''', 
                        (nombre, email, hashed_password))
         cursor.connection.commit()
-        return jsonify({"mensaje" : f"El usuario {nombre} ha sido creado"})
+        return jsonify({"mensaje" : f"ʕ•́ᴥ•̀ʔっ El usuario {nombre}, {email} ha sido creado"})
     
-    except Exception as e:
-        return jsonify({"error" : f"Error el registrar el usuario: {str(e)}"}), 500
+    except Exception as error:
+        return jsonify({"error" : f"ʕ•́ᴥ•̀ʔっ Error el registrar el usuario: {str(error)}"}), 500
     
     finally:
         #asegurarse de cerrar la conexion y el cursos a la base de datos despues de la operacion
