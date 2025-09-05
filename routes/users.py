@@ -49,7 +49,7 @@ def registrar():
         existing_user = cursor.fetchone()
 
         if existing_user:
-            return jsonify({"error" : "ʕ•́ᴥ•̀ʔっ Este usuario ya existe"}), 400
+            return jsonify({"error" : "ʕ•́ᴥ•̀ʔっ Ya hay un usuario registrado con ese email"}), 400
         # Hash a la contraseña con Flask-Bcrypt
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         #insertar el nuevo usuario
@@ -57,7 +57,7 @@ def registrar():
                        VALUES (%s, %s, %s)''', 
                        (nombre, email, hashed_password))
         cursor.connection.commit()
-        return jsonify({"mensaje" : f"ʕ•́ᴥ•̀ʔっ El usuario {nombre}, {email} ha sido creado"})
+        return jsonify({"mensaje" : f"ʕ•́ᴥ•̀ʔっ El usuario {nombre}, [{email}] ha sido creado"})
     
     except Exception as error:
         return jsonify({"error" : f"ʕ•́ᴥ•̀ʔっ Error el registrar el usuario: {str(error)}"}), 500
@@ -65,6 +65,22 @@ def registrar():
     finally:
         #asegurarse de cerrar la conexion y el cursos a la base de datos despues de la operacion
         cursor.close()
+
+@users_bp.route('/login', methods = ['POST'])
+def login():
+    data = request.json()
+
+    campos_requeridos = ["email", "password"]
+    valido, mensaje = validar_campos_requeridos(data, campos_requeridos)
+    if not valido:
+        return jsonify({"error": mensaje}), 400
+
+    email = data.get("email")
+    password = data.get("password")
+
+    cursor = get_db_connection()
+    cursor.execute("SELECT ") #<-- INCOMPLETO
+
         
 
 # No hace nada aun:
