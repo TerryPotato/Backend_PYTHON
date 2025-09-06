@@ -10,6 +10,8 @@ mysql = MySQL()
 #creamos el blueprint
 tareas_bp = Blueprint('tareas', __name__)
 
+# ------ ENDPOINTS -------
+
 #creamos un endpoint para obtener tareas
 @tareas_bp.route('/obtener', methods = ['GET'])
 def get():
