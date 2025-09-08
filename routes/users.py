@@ -90,7 +90,7 @@ def login():
     #verificamos la contraseña
     if stored_password_hash and bcrypt.check_password_hash(stored_password_hash[0], password):
         #generamos el jwt con duración de 15 minutos
-        expires = datetime.timedelta(minutes = 15)
+        expires = datetime.timedelta(minutes = 60)
         access_token = create_access_token(
             identity = str(stored_password_hash[1]),
             expires_delta = expires
