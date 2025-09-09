@@ -102,3 +102,29 @@ def actualizar(id_tarea):
         return jsonify({"error" : f"Error al actualizar los datos: {str(error)}"}), 500
     finally:
         cursor.close()
+
+
+@tareas_bp.route('/delete/<int:id_tarea>', methods=['DELETE'])
+@jwt_required()
+def borrar(id_tarea):
+    # obtener la identidad del usuario del jwt
+    current_user = get_jwt_identity()
+    cursor = get_db_connection()
+    # verificamos que la tarea exista y que el usuario logueado es el dueño de la tarea
+    cursor.execute("SELECT * FROM tareas WHERE id_tarea = %s", (id_tarea,))
+    tarea_existe = cursor.fetchone()
+    if not tarea_existe:
+        cursor.close()
+        return jsonify({"error": "La tarea no existe"}), 404
+    if not tarea_existe[1] == int(current_user):
+        cursor.close()
+        return jsonify({"error": "Usuario no autorizado"}), 401
+    # Eliminar la tarea
+    try:
+        cursor.execute('DELETE FROM tareas WHERE id_tarea = %s', (id_tarea,))
+        cursor.connection.commit()
+        return jsonify({"Mensaje": "Tarea eliminada correctamente"}), 200
+    except Exception as error:
+        return jsonify({"error": f"Error al eliminar la tarea: {str(error)}"}), 500
+    finally:
+        cursor.close()
